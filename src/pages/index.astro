@@ -162,7 +162,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     ) : (
       <div class="posts-grid">
         {posts.map(post => (
-          <a class="post-card" href={`/blog/${post.id}/`}>
+          <a class="post-card" href={`/blog/${post.id}`}>
             <div class="post-date">
               {post.data.date.toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' })}
             </div>
