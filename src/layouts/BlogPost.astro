@@ -1,0 +1,258 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  keywords?: string[];
+  author?: string;
+  image?: string;
+}
+
+const { title, description, date, keywords = [], author = 'Orba State', image } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const formattedDate = date.toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  author: { '@type': 'Organization', name: 'Orba State' },
+  publisher: { '@type': 'Organization', name: 'Orba State', url: 'https://orbastate.com' },
+  datePublished: date.toISOString(),
+  url: canonicalURL.href,
+  ...(image ? { image } : {}),
+});
+---
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} | Orba State</title>
+  <meta name="description" content={description} />
+  {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
+  <meta name="author" content={author} />
+  <link rel="canonical" href={canonicalURL} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:site_name" content="Orba State" />
+  {image && <meta property="og:image" content={image} />}
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json" set:html={jsonLd} />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Georgia, serif;
+      background: #fafaf9;
+      color: #1a1a1a;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #0a0a0a;
+      padding: 1rem 2rem;
+    }
+    header a {
+      color: #d4af6a;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    header nav {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header nav .back {
+      color: #888;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .meta {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 2rem;
+      color: #888;
+      font-size: 0.875rem;
+    }
+    .meta .date { }
+    .meta .author { }
+
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: #0a0a0a;
+    }
+
+    .description {
+      font-size: 1.125rem;
+      color: #555;
+      margin-bottom: 2rem;
+      border-left: 3px solid #d4af6a;
+      padding-left: 1rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e5e5e5;
+      margin: 2rem 0;
+    }
+
+    .content :global(h2) {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      color: #0a0a0a;
+    }
+    .content :global(h3) {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      color: #0a0a0a;
+    }
+    .content :global(p) {
+      margin-bottom: 1.25rem;
+    }
+    .content :global(ul), .content :global(ol) {
+      margin: 1rem 0 1.25rem 1.5rem;
+    }
+    .content :global(li) {
+      margin-bottom: 0.4rem;
+    }
+    .content :global(strong) {
+      color: #0a0a0a;
+      font-weight: 600;
+    }
+    .content :global(a) {
+      color: #b8943e;
+      text-decoration: underline;
+    }
+    .content :global(blockquote) {
+      border-left: 3px solid #d4af6a;
+      padding: 0.75rem 1.25rem;
+      margin: 1.5rem 0;
+      background: #f5f0e8;
+      border-radius: 0 4px 4px 0;
+      color: #444;
+    }
+    .content :global(table) {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+    .content :global(th), .content :global(td) {
+      padding: 0.6rem 0.9rem;
+      border: 1px solid #e5e5e5;
+      text-align: left;
+    }
+    .content :global(th) {
+      background: #0a0a0a;
+      color: #d4af6a;
+      font-weight: 600;
+    }
+    .content :global(tr:nth-child(even)) {
+      background: #f5f5f5;
+    }
+
+    .cta-box {
+      background: #0a0a0a;
+      color: #fff;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-top: 3rem;
+      text-align: center;
+    }
+    .cta-box h3 {
+      color: #d4af6a;
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+    }
+    .cta-box p {
+      color: #ccc;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+    }
+    .cta-box a {
+      display: inline-block;
+      background: #d4af6a;
+      color: #0a0a0a;
+      padding: 0.75rem 1.75rem;
+      border-radius: 4px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .cta-box a:hover { background: #c4a05a; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #aaa;
+      font-size: 0.8rem;
+      border-top: 1px solid #e5e5e5;
+    }
+    footer a { color: #888; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="https://orbastate.com">Orba State</a>
+      <a class="back" href="/blog">← Alle Artikel</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="meta">
+      <span class="date">{formattedDate}</span>
+      <span>·</span>
+      <span class="author">{author}</span>
+    </div>
+
+    <h1>{title}</h1>
+    <p class="description">{description}</p>
+    <hr class="divider" />
+
+    <article class="content">
+      <slot />
+    </article>
+
+    <div class="cta-box">
+      <h3>Ihr Traumhaus auf Mallorca</h3>
+      <p>Erhalten Sie kostenlose, persönliche Beratung auf Deutsch — von Experten, die Mallorca wirklich kennen.</p>
+      <a href="https://orbastate.com">Jetzt Beratung starten</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; {new Date().getFullYear()} Orba State &nbsp;|&nbsp; <a href="https://orbastate.com">orbastate.com</a></p>
+  </footer>
+</body>
+</html>
